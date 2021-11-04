@@ -1,18 +1,6 @@
 EDAM package
 ============
 
-Module contents
----------------
-
-.. automodule:: edam
+.. autoclass:: edam.reader.models.Station
    :members:
-
-.. automodule:: edam.reader.models
-   :members:
-
-.. automodule:: edam.reader.TemplateReader
-   :members:
-
-.. automodule:: edam.reader.utilities
-   :members:
-
+   :inherited-members:
