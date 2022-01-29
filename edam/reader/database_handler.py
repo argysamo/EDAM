@@ -1,7 +1,9 @@
 import copy
 import logging
 
-from edam.reader.database import db_session
+from sqlmodel import Session
+
+from edam.reader.models.database import engine
 
 database_handler = logging.getLogger('edam.reader.database_handler')
 
@@ -14,28 +16,27 @@ def add_item(item):
     :param item:
     :return: item
     """
-    session = db_session
-    session.expire_on_commit = False
-    try:
-        item_dict = copy.deepcopy(item.__dict__)  # type: dict
+    with Session(engine) as session:
+        try:
+            item_dict = copy.deepcopy(item.__dict__)  # type: dict
 
-        item_dict.pop('_sa_instance_state')
-        item_exists = session.query(item.__class__).filter_by(**item_dict)
-        if item_exists.count() > 0:
+            item_dict.pop('_sa_instance_state')
+            item_exists = session.query(item.__class__).filter_by(**item_dict)
+            if item_exists.count() > 0:
+                session.flush()
+                session.close()
+                return item_exists.first()
+            else:
+                session.add(item)
+                database_handler.debug(f"Added {item} in db")
+                session.commit()
+        except BaseException:
+            database_handler.error(f'Exception when adding {item}. Check __add_item__()')
+            session.rollback()
+            raise
+        finally:
             session.flush()
-            session.close()
-            return item_exists.first()
-        else:
-            session.add(item)
-            database_handler.debug(f"Added {item} in db")
-            session.commit()
-    except BaseException:
-        database_handler.error(f'Exception when adding {item}. Check __add_item__()')
-        session.rollback()
-        raise
-    finally:
-        session.flush()
-    session.close()
+        session.close()
     return item
 
 
@@ -55,11 +56,12 @@ def add_items(items):
 
 
 def update_item(item, metadata_dict):
-    session = db_session
-    returned_item = session.query(item.__class__).filter(
-        item.__class__.id == item.id).first()  # type: item.__class__
-    if returned_item:
-        returned_item.update_metadata(metadata_dict)
-        session.commit()
-        database_handler.debug(f"Updated {item}")
-        session.close()
+    with Session(engine) as session:
+        returned_item = session.query(item.__class__).filter(
+            item.__class__.id == item.id).first()  # type: item.__class__
+        if returned_item:
+            returned_item.update_metadata(metadata_dict)
+            session.commit()
+            session.flush()
+            database_handler.debug(f"Updated {item}")
+            session.close()
