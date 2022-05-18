@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 from setuptools.command.install import install
 from setuptools.command.test import test as TestCommand
 
-__version__ = '2.0.0'
+__version__ = '3.0.0'
 here = os.path.abspath(os.path.dirname(__file__))
 
 
