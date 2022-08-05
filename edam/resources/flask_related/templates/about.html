@@ -12,13 +12,17 @@
         }}data?station=STATION_NAME&template=TEMPLATE_NAME</code> <br/>
     Where STATION_NAME can be retrieved issuing the following request:</p>
 <p><code>Get station name</code>: <a href="{{ request.url_root }}Stations"
-                                     target="_blank">{{ request.url_root
-    }}Stations</a>
+                                     target="_blank"
+                                     rel="noopener noreferrer">
+    {{ request.url_root }}Stations
+</a>
 </p>
 
 <p>Template name can be retrieved issuing the following request:</p>
 <p><code>Get template name</code>: <a href="{{ request.url_root }}templates"
-                                      target="_blank">{{ request.url_root
+                                      target="_blank"
+                                      rel="noopener noreferrer">{{
+    request.url_root
     }}templates</a>
 </p>
 
